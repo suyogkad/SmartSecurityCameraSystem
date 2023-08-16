@@ -16,7 +16,7 @@ class VideoApp(QWidget):
 
         self.cap = cv2.VideoCapture('sample2.mp4')
 
-        ret, self.frame1 = self.cap.read()  # Read the first frame initially
+        ret, self.frame1 = self.cap.read()  # Read the first frame
         self.video_label = QLabel()
 
         start_button = QPushButton('Start Video', self)
