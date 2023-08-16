@@ -26,7 +26,7 @@ def detect_motion(frame1, frame2):
 
     # Iterate through the motion contours
     for contour in cnts:
-        # If the contour is too small, ignore it (reduce false positives)
+        # If the contour is too small, ignore it
         if cv2.contourArea(contour) < 500:
             continue
 
