@@ -1,7 +1,6 @@
 # Smart Security Camera System
 
-![Project Logo](logoo.png)
-
+![Project Logo](logo.png)
 ## Project Description
 
 The **Smart Security Camera System** is designed to enhance security by employing image processing and computer vision techniques to analyze video camera feeds. The system's primary goal is to detect unauthorized access or suspicious activities in a given environment. The project aims to showcase the application of computer vision technologies in the field of security.
