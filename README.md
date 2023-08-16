@@ -11,7 +11,7 @@ The **Smart Security Camera System** is designed to enhance security by employin
 - Unauthorized access detection
 - Image processing and computer vision techniques
 
-## Usage
+## Installation
 
 To use this Python-based project, follow these steps:
 
@@ -31,7 +31,7 @@ The project uses sample video footage from YouTube for demonstration purposes. I
 
 This project is part of an academic assignment and is not intended for commercial use. All rights to external resources belong to their respective owners.
 
-## Contact 
+## Contact
 
 For inquiries about this project, please contact:
 
