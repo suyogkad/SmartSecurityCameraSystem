@@ -30,7 +30,7 @@ def detect_motion(frame1, frame2):
         if cv2.contourArea(contour) < 500:
             continue
 
-        # Get the bounding rectangle of the contour
+        # Get bounding rectangle of the contour
         (x, y, w, h) = cv2.boundingRect(contour)
 
         # Draw a green rectangle around the motion area
