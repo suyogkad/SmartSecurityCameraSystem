@@ -1,7 +1,5 @@
+import cv2
 from motion_detection import detect_motion
 
-# Define the path to your video
-video_path = "sample1.mp4"
-
-# Call the motion detection function on your video
+video_path = "sample2.mp4"
 detect_motion(video_path)
