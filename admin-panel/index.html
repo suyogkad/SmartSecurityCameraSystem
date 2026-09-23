@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Security</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+}
+
+.logo {
+    max-height: 40px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.table {
+    table-layout: fixed; 
+    width: 100%;
+}
+
+.container {
+    padding-left: 0; 
+    padding-right: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.table {
+    margin-left: 0;
+    width: 100%;
+}
+
+.detected {
+    color: red;
+}
+
+.export-btn-container {
+    text-align: right;
+}
+
+#filterSelect {
+    margin-left: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#filterSelect:focus {
+    border-color: #007bff;
+}
+
+.export-btn-container .btn-success {
+    margin-right: 10px;
+    position: relative;
+    padding-left: 30px;
+}
+
+.export-btn-container .btn-success:before {
+    content: '\2199';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+}
+
+
+th:nth-child(1) { /* ID column */
+    width: 5%;
+}
+th:nth-child(2) { /* Title column */
+    width: 10%;
+}
+th:nth-child(3) { /* Detection Times column */
+    width: 17%;
+}
+th:nth-child(4) { /* Detection Types column */
+    width: 10%;
+}
+th:nth-child(5) { /* Recorded Date column */
+    width: 10%;
+}
+th:nth-child(6) { /* Intrusion Status column */
+    width: 10%;
+}
+th:nth-child(7) { /* Intrusion Detected At column */
+    width: 15%;
+}
+th:nth-child(8) { /* See Video column */
+    width: 8%;
+}
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">
+            Smart Security - Cloud Logs
+        </h2>
+
+        <div class="mt-4 d-flex justify-content-between">
+            <select id="filterSelect" onchange="applyFilter()">
+                <option value="all">All Videos</option>
+                <option value="recents">Recent Videos</option>
+                <option value="intrusions">Intrusion Detected</option>
+            </select>
+            <div class="export-btn-container">
+                <button class="btn btn-success" onclick="exportToCSV()">Export Log</button>
+            </div>
+        </div>
+
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Detection Times</th>
+                    <th>Detection Types</th>
+                    <th>Recorded Date</th>
+                    <th>Intrusion Status</th>
+                    <th>Intrusion Details</th>
+                    <th>See Video</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Data populating using JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal for video playback -->
+    <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Video Playback</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <video width="100%" controls id="videoPlayer">
+                        <!-- Video source using JavaScript -->
+                    </video>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let videoLogsCache = [];
+    
+        function parseCSV(data) {
+            const allRows = data.split(/\r?\n|\r/);
+            const headers = allRows[0].split(',');
+            const videoLogs = [];
+            for (let i = 1; i < allRows.length; i++) {
+                if (!allRows[i]) continue;  // skip empty lines
+                const rowData = allRows[i].split(',');
+                const videoData = {};
+                for (let j = 0; j < headers.length; j++) {
+                    videoData[headers[j]] = rowData[j];
+                }
+                videoLogs.push(videoData);
+            }
+            return videoLogs;
+        }
+    
+        function fetchVideos() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', './dataset.csv', true); // Updated path
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    videoLogsCache = parseCSV(xhr.responseText);
+                    applyFilter();
+                }
+            };
+            xhr.send();
+        }
+    
+        function appendToTable(videoData) {
+            const tableBody = document.getElementById('tableBody');
+            let row = tableBody.insertRow();
+            row.insertCell(0).textContent = videoData.ID || "";
+            row.insertCell(1).textContent = videoData.Title || "";
+    
+            let detectionCell = row.insertCell(2);
+            detectionCell.innerHTML = (videoData['Detection Times'] || "").replace(/,/g, ",<br>");
+    
+            let detectionCellTwo = row.insertCell(3);
+            detectionCellTwo.innerHTML = (videoData['Detection Types'] || "").replace(/,/g, ",<br>");
+    
+            row.insertCell(4).textContent = videoData['Recorded Date'] || "";
+            const intrusionCell = row.insertCell(5);
+            intrusionCell.textContent = videoData['Intrusion Status'] || "";
+    
+            if (videoData['Intrusion Status'] === "Detected") {
+                intrusionCell.classList.add("detected");
+            }
+    
+            row.insertCell(6).textContent = videoData['Intrusion Details'] || "";
+            let viewBtn = document.createElement('button');
+            viewBtn.className = 'btn btn-info';
+            viewBtn.innerText = 'View Video';
+            viewBtn.onclick = function () {
+                let videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.src = `./savedRecordings/${videoData['Video URL']}`; // Updated path
+                $('#videoModal').modal('show');
+            };
+            row.insertCell(7).appendChild(viewBtn);
+        }
+
+        function applyFilter() {
+            const filterValue = document.getElementById('filterSelect').value;
+            videoLogsCache.sort((a, b) => new Date(b['Recorded Date']) - new Date(a['Recorded Date']));
+
+            let filteredData;
+
+            switch (filterValue) {
+                case "recents":
+                    const oneWeekAgo = new Date();
+                    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                    filteredData = videoLogsCache.filter(video => new Date(video['Recorded Date']) >= oneWeekAgo);
+                    break;
+                case "intrusions":
+                    filteredData = videoLogsCache.filter(video => video['Intrusion Status'] === "Detected");
+                    break;
+                default:
+                    filteredData = videoLogsCache;
+            }
+
+            // Clear table body
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = "";
+
+            filteredData.forEach(video => {
+                appendToTable(video['Video URL'], video);
+            });
+        }
+
+        function exportToCSV() {
+            const csv = generateCSV(videoLogsCache);
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'exported_data.csv';
+            a.click();
+        }
+
+        function generateCSV(data) {
+            const replacer = (key, value) => value === null ? '' : value;
+            const header = Object.keys(data[0]);
+            let csv = data.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','));
+            csv.unshift(header.join(','));
+            return csv.join('\r\n');
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchVideos);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

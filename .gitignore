@@ -1,0 +1,34 @@
+# --- Secrets -------------------------------------------------------------
+.env
+*firebase-adminsdk*.json
+firebase-credentials.json
+serviceAccount*.json
+
+# --- Python --------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# --- IDE / OS ------------------------------------------------------------
+.idea/
+.vscode/
+.DS_Store
+
+# --- Model weights (downloaded automatically by torch.hub) ---------------
+*.pt
+
+# --- Generated data: recordings, logs, exports ---------------------------
+savedRecordings/
+LiveRecordings/
+ProcessedVideos/
+*.db
+dataset.csv
+admin-panel/dataset.csv
+reencoded_*
+
+# --- Academic report (kept private) --------------------------------------
+*.docx
+Suyog_Kadariya_21421999_CSY3013_Report/
